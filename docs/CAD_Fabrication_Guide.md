@@ -2,7 +2,12 @@
 
 This guide covers the parametric FreeCAD CAD suite in [`cad/`](../cad/), how its geometry and mass properties are checked against [params_1d_cube.m](../simulink/params_1d_cube.m), and how to make every part.
 
-**Manufacturing split**
+There are two rig variants, sharing the clamp hub, base, stop pads and all purchased parts:
+
+* **Acrylic + brass** (`generate_cad_models.py`), described in sections 1–5.
+* **All 3D-printed** (`generate_printed_models.py`), described in section 7. It uses a printed frame and a printed flywheel ballasted with steel bolts.
+
+**Manufacturing split (acrylic + brass variant)**
 
 | Process | Parts |
 |---|---|
@@ -26,11 +31,27 @@ import generate_cad_models as g; g.build_all()
 `build_all()` writes into the script's own folder:
 
 * one `.FCStd` per fabricated part;
-* `BalanceCube_1D_Assembly.FCStd`, where the fabricated parts are **App::Links** to their own files and the purchased parts are embedded reference solids;
+* `BalanceCube_1D_Assembly.FCStd`, a real **Assembly-workbench** assembly (see "Using the assembly" below);
 * `exports/`: STEP for every part and the assembly, STL for every part, and the laser DXF;
 * `cad_verification_report.json`.
 
 The part documents stay open after a run because the assembly links to them.
+
+### Using the assembly
+
+The assembly document contains an `Assembly` object (FreeCAD 1.x Assembly workbench). Fabricated parts are App::Links to their own `.FCStd` files; purchased parts are embedded solids. The joints are built by [assembly_utils.py](../cad/assembly_utils.py):
+
+| Joint | Type | Connects |
+|---|---|---|
+| `GroundedJoint` | Grounded | Base_And_Stops |
+| `Pivot_Revolute` | Revolute about the Y axis, limits ±45° | base ↔ pivot shaft |
+| `Flywheel_Revolute` | Revolute about the motor shaft | motor ↔ flywheel |
+| `Fix_*` | Fixed | KP08s, pads and PCB to the base; clamp, inner rings, frame, motor, encoder, IMU, fasteners (and the ballast, on the printed rig) to the pendulum or the wheel |
+
+* **Moving parts:** double-click `Assembly` to activate it, then drag the frame or flywheel. The pendulum swings about the pivot and the wheel spins. Everything else stays put.
+* **Exploded view:** expand `Exploded Views` and double-click `Exploded_View` to toggle it, or edit its `MoveNN` steps.
+* The joint frames are computed from the design parameters, not from picked faces, so they survive a regeneration with changed dimensions.
+* The ±45° limits are stored on `Pivot_Revolute`, but a plain `solve()` from Python does not enforce them. Check them by dragging in the GUI.
 
 **Before you fabricate, measure your actual parts** and set these values:
 
@@ -82,7 +103,7 @@ Both printed parts are modelled in their print orientation. Load the STLs as the
 | Total rotating mass (plate, clamp, shaft, wheel, motor, IMU, fasteners) | 0.774 kg | 0.727 kg |
 | Pendulum reduced inertia I_p | 5.30e-3 kg·m² | 5.77e-3 kg·m² (**−8.1 %**) |
 
-The total mass difference is mostly the 38 g steel shaft, which sits on the pivot axis and adds no gravity torque or inertia. The I_p gap comes from `params_1d_cube.m` modelling the plate plus 45 g of "extra frame mass" as a full uniform square (I = m·s²/6). The CAD uses the actual cut-out plate and point-mass hardware. Neither value has been changed here. Before final LQR tuning, decide which one to trust, or measure the real I_p with a swing test.
+The total mass difference is mostly the 38 g steel shaft, which sits on the pivot axis and adds no gravity torque or inertia. The I_p gap is explained in section 6.
 
 ---
 
@@ -116,6 +137,59 @@ Edit these `BalanceCubeCADParams` fields:
 * `flywheel_bore_dia_mm`
 
 Then re-run `build_all()` and check that `cad_verification_report.json` shows zero sweep overlap and `setscrew_on_shaft: true`.
+
+---
+
+## 6. Why the CAD and `params_1d_cube.m` disagree on I_p
+
+[compare_cad_inertia.m](../simulink/compare_cad_inertia.m) reads the per-component breakdown from `cad_verification_report.json` and rebuilds the `params_1d_cube.m` value term by term. Run it in MATLAB from `simulink/`. The formulas in `params_1d_cube.m` are correct; the −8 % comes from three simplifying assumptions:
+
+| Term | params | CAD | Δ | Cause |
+|---|---|---|---|---|
+| Plate | 1.444e-3 | 1.433e-3 | −1.2e-5 | Full 140 × 140 square vs the real cut-out plate |
+| "Extra frame mass" 45 g | 4.64e-4 | 1.24e-4 | **−3.40e-4** | params spreads it over the whole square at L = 84 mm. In reality the 27 g clamp hub sits at the pivot (z ≈ 3 mm) and most fasteners at z ≈ 17 mm; only the 5 g IMU is high up. |
+| Motor (stator + rotor) | 1.117e-3 | 9.43e-4 | **−1.73e-4** | params puts all 155 g at L = 84 mm. The JGB37 gearbox is eccentric, so the can and armature sit 7 mm lower. |
+| Flywheel (point mass) | 2.732e-3 | 2.802e-3 | +7.0e-5 | The rim + web formula omits the Ø16 hub boss |
+| **Total I_p** | **5.757e-3** | **5.301e-3** | **−4.56e-4** | |
+
+The same assumptions put the gravity stiffness Mgl 5.1 % too high (0.599 vs 0.568 N·m). Because I_p and Mgl both drop, the unstable pole barely moves (10.20 → 10.35 rad/s). The shipped LQR gains remain stable on the CAD plant (closed-loop |λ|max = 0.9970), and the re-synthesised gains differ by about 5 %. Nothing in `params_1d_cube.m` was changed.
+
+**Not checked:** `motor_rotor_J_kgm2 = 5e-6` is labelled "reflected". A bare 520-size armature reflected through a 6.25:1 gearbox (×39) could be several times that. Measure it, or take it from the motor datasheet.
+
+---
+
+## 7. All-3D-printed variant
+
+Generated by [generate_printed_models.py](../cad/generate_printed_models.py) (`gp.build_all_printed()`; run `generate_cad_models.build_all()` first for the shared parts). All dimensions are fields of `PrintedRigParams`, which extends `BalanceCubeCADParams`. `validate()` rejects ballast layouts that do not fit.
+
+![Printed rig](../cad/renders/printed_assembly_isometric.png)
+
+| Part | Material | Notes |
+|---|---|---|
+| **Printed_Frame_140mm** ([STL](../cad/exports/Printed_Frame_140mm.stl)) | PETG, 100 % infill, printed flat | Same geometry as the acrylic frame, with every hole grown by `print_hole_comp_mm`. Needs a ≥ 200 × 200 mm bed. |
+| **Printed_Flywheel_Ballast** ([STL](../cad/exports/Printed_Flywheel_Ballast.stl)) | PETG, 100 % infill, far face down, no supports | Ø110 mm × 25.6 mm rim. 12 axial M8 holes on a Ø90.6 circle, with hex head pockets in the far face and nut pockets on the plate side. Printed 6 mm D-bore hub with a captive M3 nut slot (drop the nut in from the hub face before mounting). The grub screw is reached through a radial Ø3.4 teardrop access hole at +Z, with a balancing twin at −Z. |
+| **Ballast** | 12× ISO 4017 M8 × 20 hex bolts + 12× ISO 4032 M8 nuts (steel) | 17.9 g per set, 215 g total |
+
+Clamp hub, base, stop pads, shaft, KP08s, motor and electronics are the same as the acrylic rig. The clamp slot (6.3 mm) suits a 6.0 mm printed frame.
+
+### Is it enough?
+
+[evaluate_flywheel_variants.m](../simulink/evaluate_flywheel_variants.m) takes the CAD mass properties of each variant and runs them through the same motor, driver and LQR weights as `params_1d_cube.m`. It reports linear metrics, then runs a nonlinear closed-loop simulation (sin θ gravity, ±10 V saturation, back-EMF, ZOH at 200 Hz) of a 5° start plus the standard 0.04 N·m × 0.1 s tap. It also bisects for the largest recoverable start tilt.
+
+| Variant | Wheel mass | Iw (incl. rotor) | I_p | Mgl | Recoverable start tilt | Peak wheel speed | Peak current |
+|---|---|---|---|---|---|---|---|
+| params_1d_cube | 0.387 kg | 5.20e-4 | 5.76e-3 | 0.599 N·m | 15.1° | 144 rpm | 2.75 A |
+| Acrylic + brass (CAD) | 0.397 kg | 5.16e-4 | 5.30e-3 | 0.568 N·m | 16.0° | 135 rpm | 2.75 A |
+| **All printed + 12× M8 (CAD)** | **0.379 kg** | **7.63e-4** | **5.27e-3** | **0.561 N·m** | **17.4°** | **91 rpm** | **2.49 A** |
+
+**Verdict: yes.** The printed wheel has 48 % more spin inertia than the brass one at 5 % less mass. The motor has to hold less gravity torque (static torque angle 20.9° vs 20.6°) and stores the same momentum at a lower wheel speed. Every metric is equal or better, all well inside the 1333 rpm back-EMF limit and the 3 A fuse. The shipped LQR gains are also stable on this plant (|λ|max = 0.9964).
+
+Sensitivity (printed I_p and Mgl held fixed): recoverable tilt is 11.9° at Iw = 2e-4, 15.1° at 4e-4, 16.0° at 5.2e-4, 17.2° at 7.6e-4 and 17.9° at 1e-3. Gains flatten above about 5e-4, so `ballast_count = 8` would still match the brass wheel if you want it lighter.
+
+**Watch-outs:**
+* The wheel overhangs the 15 mm motor shaft: it engages only 7.5 mm, and the rim CoM sits about 15 mm beyond the gearbox face. Check for wobble. If it's excessive, use a metal 6 mm D-shaft flange coupling instead of the printed hub.
+* Print at 100 % infill and balance it statically on two knife edges before fitting. Swapping bolts or nuts between positions corrects small imbalances.
+* Clearances on this rig: 5.5 mm from rim to clamp hub, 1.5 mm from hub face to frame, 2.0 mm from rim to frame, 1.7 mm to the motor-screw heads.
 
 ---
 

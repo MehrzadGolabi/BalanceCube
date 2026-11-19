@@ -281,8 +281,10 @@ CLAMP_BOLT_XZ = [(0.0, 17.0), (-9.0, 11.0), (9.0, 11.0)]
 
 # --------------------------------------------------------------------------- parts
 
-def build_square_frame(p: BalanceCubeCADParams) -> Part.Shape:
-    """6 mm acrylic diamond, laser cut."""
+def build_square_frame(p: BalanceCubeCADParams, hole_comp: float = 0.0) -> Part.Shape:
+    """6 mm diamond frame. Laser-cut acrylic by default; hole_comp > 0 grows every hole
+    for an FDM-printed version (printed holes come out undersize)."""
+    c = 0.5 * hole_comp
     h_diag = p.square_side_mm / math.sqrt(2.0)
     z_bot_tip = -p.pivot_corner_offset_mm
     z_mid = p.L_center_mm
@@ -314,28 +316,28 @@ def build_square_frame(p: BalanceCubeCADParams) -> Part.Shape:
     y0, y1 = -half_y - 1.0, half_y + 1.0
 
     # 1. Pivot shaft bore + 3x M3 clamp hub bolt holes
-    cuts.append(_cylinder_y(0.5 * p.pivot_bore_plate_mm, y0, y1, (0.0, 0.0)))
+    cuts.append(_cylinder_y(0.5 * p.pivot_bore_plate_mm + c, y0, y1, (0.0, 0.0)))
     for hx, hz in CLAMP_BOLT_XZ:
-        cuts.append(_cylinder_y(1.6, y0, y1, (hx, hz)))
+        cuts.append(_cylinder_y(1.6 + c, y0, y1, (hx, hz)))
 
     # 2. Central motor output shaft & bearing-boss clearance bore (13 mm)
-    cuts.append(_cylinder_y(0.5 * p.motor_shaft_clear_bore_mm, y0, y1, (0.0, z_mid)))
+    cuts.append(_cylinder_y(0.5 * p.motor_shaft_clear_bore_mm + c, y0, y1, (0.0, z_mid)))
 
     # 3. JGB37-520 faceplate screws (only the 3 used positions)
     for deg in p.motor_bolt_angles_deg:
         hx, hz = _motor_hole_xz(p, deg)
-        cuts.append(_cylinder_y(0.5 * p.motor_bolt_hole_dia_mm, y0, y1, (hx, hz)))
+        cuts.append(_cylinder_y(0.5 * p.motor_bolt_hole_dia_mm + c, y0, y1, (hx, hz)))
 
     # 4. Top symmetric MPU6050 IMU mount (M3 x 2, level along X axis above flywheel)
     for sign in (-1.0, 1.0):
-        cuts.append(_cylinder_y(0.5 * p.imu_hole_dia_mm, y0, y1, (sign * 0.5 * p.imu_hole_spacing_mm, p.imu_mount_z_mm)))
+        cuts.append(_cylinder_y(0.5 * p.imu_hole_dia_mm + c, y0, y1, (sign * 0.5 * p.imu_hole_spacing_mm, p.imu_mount_z_mm)))
 
     # 5. Zip-tie cable strain relief slots along lower-right edge
     for center_s in (56.0, 84.0):
         cx = center_s / math.sqrt(2.0) - 10.0 / math.sqrt(2.0)
         cz = (center_s / math.sqrt(2.0) + z_bot_tip) + 10.0 / math.sqrt(2.0)
-        cuts.append(_slot_y(cx - 2.8, cz + 2.8, 5.2, 2.2, 45.0, y0, y1))
-        cuts.append(_slot_y(cx + 2.8, cz - 2.8, 5.2, 2.2, 45.0, y0, y1))
+        cuts.append(_slot_y(cx - 2.8, cz + 2.8, 5.2 + hole_comp, 2.2 + hole_comp, 45.0, y0, y1))
+        cuts.append(_slot_y(cx + 2.8, cz - 2.8, 5.2 + hole_comp, 2.2 + hole_comp, 45.0, y0, y1))
 
     return plate.cut(Part.makeCompound(cuts)).removeSplitter()
 
@@ -660,7 +662,208 @@ def _compound_com(shape: Part.Shape) -> App.Vector:
     return acc * (1.0 / tot)
 
 
+
+def analyze_rig(p: BalanceCubeCADParams, *, plate, plate_density, wheel_parts, wheel_axis_xz, wheel_envelope,
+                wheel_bore_y, setscrew_y, clamp, shaft, motor, encoder, imu, fasteners, base, pads, others) -> dict:
+    """Mass properties about the pivot, interference sweep and flywheel clearances for a rig.
+
+    wheel_parts: [(shape in assembly position, density kg/m^3), ...] -- everything that spins with the wheel.
+    wheel_envelope: (radius, y_min, y_max) of the spinning wheel.  wheel_bore_y: (y_min, y_max) of the D-bore.
+    """
+    # Pendulum (wheel spin inertia excluded; the wheel only counts as a point mass at its CoM)
+    m_plate, c_plate, I_plate = _mass_props(plate, density_kgm3=plate_density)
+    m_clamp, c_clamp, I_clamp = _mass_props(clamp, density_kgm3=p.print_density_kgm3)
+    m_shaft, _, I_shaft = _mass_props(shaft, density_kgm3=p.steel_density_kgm3)
+
+    ax, az = wheel_axis_xz
+    m_wheel = 0.0
+    mom = App.Vector(0, 0, 0)
+    I_spin = 0.0
+    for shp, rho in wheel_parts:
+        for sol in shp.Solids:
+            m_i = sol.Volume * 1e-9 * rho
+            c = sol.CenterOfMass
+            m_wheel += m_i
+            mom += c * m_i
+            I_spin += sol.MatrixOfInertia.A22 * rho * 1e-15 + m_i * (((c.x - ax) * 1e-3) ** 2 + ((c.z - az) * 1e-3) ** 2)
+    com_wheel = mom * (1.0 / m_wheel)
+    I_wheel_pend = m_wheel * ((com_wheel.x * 1e-3) ** 2 + (com_wheel.z * 1e-3) ** 2)
+
+    motor_and_enc = Part.makeCompound([build_motor_body(p), encoder])
+    m_motor, _, I_motor = _mass_props(motor_and_enc, mass_kg=p.motor_mass_kg)
+    m_imu = p.imu_mass_kg
+    I_imu = m_imu * (p.imu_mount_z_mm * 1e-3) ** 2
+    # Fasteners as point masses: 3x M3x8 button (0.9 g), 3x M3x20 SHCS + nut (2.2 g), 2x M3x25 + nut (2.5 g)
+    fast_pts = [(0.9e-3, _motor_hole_xz(p, d)) for d in p.motor_bolt_angles_deg]
+    fast_pts += [(2.2e-3, xz) for xz in CLAMP_BOLT_XZ]
+    fast_pts += [(2.5e-3, (0.0, -10.5))] * 2
+    m_fast = sum(m for m, _ in fast_pts)
+    I_fast = sum(m * ((x * 1e-3) ** 2 + (z * 1e-3) ** 2) for m, (x, z) in fast_pts)
+    z_fast = sum(m * z for m, (_, z) in fast_pts) / m_fast
+
+    def _row(m, z_mm, i_pivot):
+        return {"m_kg": m, "z_com_m": z_mm * 1e-3, "I_pivot_kgm2": i_pivot}
+    breakdown = {
+        "plate": _row(m_plate, c_plate.z, I_plate),
+        "clamp_hub": _row(m_clamp, c_clamp.z, I_clamp),
+        "pivot_shaft": _row(m_shaft, 0.0, I_shaft),
+        "flywheel_point_mass": _row(m_wheel, com_wheel.z, I_wheel_pend),
+        "motor_encoder": _row(m_motor, _compound_com(motor_and_enc).z, I_motor),
+        "imu": _row(m_imu, p.imu_mount_z_mm, I_imu),
+        "fasteners": _row(m_fast, z_fast, I_fast),
+    }
+    m_total = sum(r["m_kg"] for r in breakdown.values())
+    I_pend = sum(r["I_pivot_kgm2"] for r in breakdown.values())
+    Mgl = 9.80665 * sum(r["m_kg"] * r["z_com_m"] for r in breakdown.values())
+    mass = {
+        "cad_plate_kg": round(m_plate, 5),
+        "cad_clamp_hub_petg_kg": round(m_clamp, 5),
+        "cad_pivot_shaft_kg": round(m_shaft, 5),
+        "cad_flywheel_kg": round(m_wheel, 5),
+        "cad_motor_encoder_kg": round(m_motor, 5),
+        "cad_imu_fasteners_kg": round(m_imu + m_fast, 5),
+        "cad_flywheel_I_spin_kgm2": float(f"{I_spin:.6e}"),
+        "cad_flywheel_I_spin_exact_kgm2": I_spin,
+        "cad_total_rotating_kg": round(m_total, 4),
+        "cad_Ip_reduced_kgm2": float(f"{I_pend:.5e}"),
+        "cad_Mgl_Nm": round(Mgl, 5),
+        "breakdown": breakdown,
+    }
+
+    # Interference sweep: everything on the pendulum vs everything stationary, every 5 deg
+    wheel_all = Part.makeCompound([s for s, _ in wheel_parts])
+    rotating = {"plate": plate, "flywheel": wheel_all, "clamp": clamp, "motor": motor,
+                "encoder": encoder, "imu": imu, "fasteners": fasteners}
+    stationary = dict({"base": base, "pad_L": pads[0], "pad_R": pads[1]}, **others)
+    sweep, min_clear = {}, {}
+    lim = int(round(p.stop_angle_deg))
+    for deg in range(-lim, lim + 1, 5):
+        total_overlap = 0.0
+        for rn, rs in rotating.items():
+            rot = rs.copy()
+            rot.rotate(_v(0, 0, 0), _v(0, 1, 0), float(deg))
+            for sn, ss in stationary.items():
+                d = rot.distToShape(ss)[0]
+                if d < 1e-6:
+                    total_overlap += rot.common(ss).Volume
+                key = f"{rn}~{sn}"
+                if key not in min_clear or d < min_clear[key][0]:
+                    min_clear[key] = (round(d, 3), deg)
+        sweep[f"{deg:+d}deg_overlap_mm3"] = round(float(total_overlap), 4)
+    tightest = dict(sorted(min_clear.items(), key=lambda kv: kv[1][0])[:8])
+
+    # Spinning flywheel (relative motion) vs everything fixed to the pendulum
+    R, y0, y1 = wheel_envelope
+    env = _cylinder_y(R, y0, y1, wheel_axis_xz)
+    y_face = 0.5 * p.plate_thickness_mm
+    shaft_tip = y_face - p.motor_shaft_len_mm
+    flywheel_rel = {
+        "envelope_vs_plate_mm": round(env.distToShape(plate)[0], 3),
+        "envelope_vs_clamp_mm": round(env.distToShape(clamp)[0], 3),
+        "envelope_vs_motor_body_mm": round(env.distToShape(build_motor_body(p))[0], 3),
+        "envelope_vs_imu_mm": round(env.distToShape(imu)[0], 3),
+        "flywheel_vs_fastener_heads_mm": round(wheel_all.distToShape(fasteners)[0], 3),
+        "dshaft_in_bore_overlap_mm3": round(motor.common(wheel_all).Volume, 4),
+        "dshaft_engagement_mm": round(min(y_face, wheel_bore_y[1]) - max(shaft_tip, wheel_bore_y[0]), 2),
+        "setscrew_on_shaft": bool(shaft_tip < setscrew_y - 0.5 * p.flywheel_setscrew_tap_mm),
+    }
+
+    stop_contact = {}
+    for deg in (-p.stop_angle_deg, p.stop_angle_deg):
+        r = plate.copy()
+        r.rotate(_v(0, 0, 0), _v(0, 1, 0), deg)
+        pad = pads[0] if deg < 0 else pads[1]
+        stop_contact[f"{deg:+.0f}deg"] = {
+            "plate_to_pad_mm": round(r.distToShape(pad)[0], 4),
+            "plate_to_base_mm": round(r.distToShape(base)[0], 3),
+        }
+    return {"mass": mass, "sweep": sweep, "tightest": tightest, "flywheel_rel": flywheel_rel, "stop_contact": stop_contact}
+
+
 # --------------------------------------------------------------------------- build
+
+PURCHASED_COLORS = {
+    "Pivot_Shaft_8mm": (0.80, 0.82, 0.84),
+    "PillowBlock_KP08_Front": (0.18, 0.36, 0.22),
+    "PillowBlock_KP08_Rear": (0.18, 0.36, 0.22),
+    "KP08_Insert_Rings": (0.82, 0.84, 0.86),
+    "Motor_JGB37_520": (0.64, 0.67, 0.70),
+    "Motor_Encoder_Rear": (0.14, 0.14, 0.16),
+    "Fastener_Heads_M3": (0.85, 0.85, 0.88),
+    "IMU_MPU6050": (0.10, 0.32, 0.68),
+    "Electronics_Module_Offboard": (0.12, 0.45, 0.22),
+}
+
+
+def build_rig_assembly(path: Path, doc_name: str, p: BalanceCubeCADParams, *, frame, flywheel, clamp, base, pad,
+                       wheel_pl: App.Placement, pad_pls: list, purchased: dict,
+                       frame_name: str, flywheel_name: str, extra_members: list | None = None,
+                       extra_fixed_to_frame: list | None = None, extra_fixed_to_flywheel: list | None = None):
+    """Assembly-workbench document shared by the acrylic/brass and all-printed rigs.
+
+    Pendulum chain: shaft -(revolute, +/-stop angle)- base;  clamp, frame, motor, encoder,
+    IMU, fasteners fixed to the shaft/frame;  flywheel -(revolute)- motor.
+    """
+    from assembly_utils import ROT_Z_TO_Y, ExplodeMove, JointSpec, Member, build_assembly_document
+
+    members = [
+        Member(frame_name, link_target=frame),
+        Member(flywheel_name, link_target=flywheel, placement=wheel_pl),
+        Member("Pivot_Clamp_Hub", link_target=clamp),
+        Member("Base_And_Stops", link_target=base),
+        Member("Stop_Pad_TPU_Left", link_target=pad, placement=pad_pls[0]),
+        Member("Stop_Pad_TPU_Right", link_target=pad, placement=pad_pls[1]),
+    ]
+    for n, s in purchased.items():
+        members.append(Member(n, shape=s, color=PURCHASED_COLORS.get(n, (0.7, 0.7, 0.7))))
+    members += extra_members or []
+
+    origin = App.Placement()
+    pivot = App.Placement(_v(0, 0, 0), ROT_Z_TO_Y)
+    spin = App.Placement(_v(0, wheel_pl.Base.y, p.L_center_mm), ROT_Z_TO_Y)
+    fixed = lambda n, a, b: JointSpec("Fixed", n, a, b, origin)
+    lim = p.stop_angle_deg
+    joints = [
+        fixed("Fix_KP08_Front", "Base_And_Stops", "PillowBlock_KP08_Front"),
+        fixed("Fix_KP08_Rear", "Base_And_Stops", "PillowBlock_KP08_Rear"),
+        fixed("Fix_Pad_Left", "Base_And_Stops", "Stop_Pad_TPU_Left"),
+        fixed("Fix_Pad_Right", "Base_And_Stops", "Stop_Pad_TPU_Right"),
+        fixed("Fix_Electronics", "Base_And_Stops", "Electronics_Module_Offboard"),
+        JointSpec("Revolute", "Pivot_Revolute", "Base_And_Stops", "Pivot_Shaft_8mm", pivot, (-lim, lim)),
+        fixed("Fix_Clamp_to_Shaft", "Pivot_Shaft_8mm", "Pivot_Clamp_Hub"),
+        fixed("Fix_KP08_Inner_Rings", "Pivot_Shaft_8mm", "KP08_Insert_Rings"),
+        fixed("Fix_Frame_to_Clamp", "Pivot_Clamp_Hub", frame_name),
+        fixed("Fix_Motor", frame_name, "Motor_JGB37_520"),
+        fixed("Fix_Encoder", "Motor_JGB37_520", "Motor_Encoder_Rear"),
+        fixed("Fix_IMU", frame_name, "IMU_MPU6050"),
+        fixed("Fix_Fasteners", frame_name, "Fastener_Heads_M3"),
+        JointSpec("Revolute", "Flywheel_Revolute", "Motor_JGB37_520", flywheel_name, spin),
+    ]
+    for n in extra_fixed_to_frame or []:
+        joints.append(fixed(f"Fix_{n}", frame_name, n))
+    for n in extra_fixed_to_flywheel or []:
+        joints.append(JointSpec("Fixed", f"Fix_{n}", flywheel_name, n, spin))
+    on_wheel = [flywheel_name] + list(extra_fixed_to_flywheel or [])
+
+    explode = [
+        ExplodeMove(on_wheel, _v(0, -70, 0)),
+        ExplodeMove(["Fastener_Heads_M3"], _v(0, -35, 0)),
+        ExplodeMove(["Motor_JGB37_520", "Motor_Encoder_Rear"], _v(0, 80, 0)),
+        ExplodeMove(["Motor_Encoder_Rear"], _v(0, 40, 0)),
+        ExplodeMove(["IMU_MPU6050"], _v(0, 45, 15)),
+        ExplodeMove([frame_name] + list(extra_fixed_to_frame or []), _v(0, 0, 70)),
+        ExplodeMove(["Pivot_Clamp_Hub"], _v(0, 0, 30)),
+        ExplodeMove(["PillowBlock_KP08_Front"], _v(0, -45, 0)),
+        ExplodeMove(["PillowBlock_KP08_Rear"], _v(0, 45, 0)),
+        ExplodeMove(["Stop_Pad_TPU_Left", "Stop_Pad_TPU_Right"], _v(0, 0, 25)),
+    ]
+    if extra_fixed_to_flywheel:
+        explode.insert(1, ExplodeMove(list(extra_fixed_to_flywheel), _v(0, -40, 0)))
+    doc, asm, _, status = build_assembly_document(path, doc_name, "Base_And_Stops", members, joints, explode)
+    if status != 0:
+        App.Console.PrintWarning(f"{doc_name}: assembly solver returned {status}\n")
+    return doc, asm
+
 
 PART_COLORS = {
     "Square_Frame_140mm": ((0.82, 0.92, 0.98), 55),
@@ -753,102 +956,38 @@ def build_all(cad_dir: str | Path | None = None, close_parts_keep_assembly: bool
         if "dxf" in fmts:
             _export_laser_dxf(shp, exports_dir / f"{name}_LaserCut.dxf")
 
-    # Assembly: fabricated parts are App::Links to their own .FCStd, purchased parts are embedded
-    assy = App.newDocument("BalanceCube_1D_Assembly")
-    assy.saveAs(str(cad_root / "BalanceCube_1D_Assembly.FCStd"))  # links to other files need a saved owner
-    objs = [
-        _add_link(assy, "Square_Frame_140mm", part_docs["Square_Frame_140mm"][1]),
-        _add_link(assy, "Brass_Flywheel_90mm", part_docs["Brass_Flywheel_90mm"][1], wheel_pl),
-        _add_link(assy, "Pivot_Clamp_Hub", part_docs["Pivot_Clamp_Hub"][1]),
-        _add_link(assy, "Base_And_Stops", part_docs["Base_And_Stops"][1]),
-        _add_link(assy, "Stop_Pad_TPU_Left", part_docs["Stop_Pad_TPU"][1], pad_pls[0]),
-        _add_link(assy, "Stop_Pad_TPU_Right", part_docs["Stop_Pad_TPU"][1], pad_pls[1]),
-        _add_part(assy, "Pivot_Shaft_8mm", s_shaft, (0.80, 0.82, 0.84)),
-        _add_part(assy, "PillowBlock_KP08_Front", s_kp_f_housing, (0.18, 0.36, 0.22)),
-        _add_part(assy, "PillowBlock_KP08_Rear", s_kp_r_housing, (0.18, 0.36, 0.22)),
-        _add_part(assy, "KP08_Insert_Rings", s_kp_f_ring.fuse(s_kp_r_ring), (0.82, 0.84, 0.86)),
-        _add_part(assy, "Motor_JGB37_520", s_motor, (0.64, 0.67, 0.70)),
-        _add_part(assy, "Motor_Encoder_Rear", s_encoder, (0.14, 0.14, 0.16)),
-        _add_part(assy, "Fastener_Heads_M3", s_fasteners, (0.85, 0.85, 0.88)),
-        _add_part(assy, "IMU_MPU6050", s_imu, (0.10, 0.32, 0.68)),
-        _add_part(assy, "Electronics_Module_Offboard", s_electronics, (0.12, 0.45, 0.22)),
-    ]
-    assy.recompute()
-    assy.saveAs(str(cad_root / "BalanceCube_1D_Assembly.FCStd"))
-    _export_step(objs, exports_dir / "BalanceCube_1D_Assembly.step")
+    # Assembly-workbench document: fabricated parts are App::Links to their own .FCStd,
+    # purchased parts are embedded. Joints: base grounded, pendulum revolute about the
+    # pivot (limited to the +/-45 deg stops), flywheel revolute about the motor shaft.
+    assy, asm = build_rig_assembly(
+        cad_root / "BalanceCube_1D_Assembly.FCStd", "BalanceCube_1D_Assembly", p,
+        frame=part_docs["Square_Frame_140mm"][1], flywheel=part_docs["Brass_Flywheel_90mm"][1],
+        clamp=part_docs["Pivot_Clamp_Hub"][1], base=part_docs["Base_And_Stops"][1], pad=part_docs["Stop_Pad_TPU"][1],
+        wheel_pl=wheel_pl, pad_pls=pad_pls,
+        purchased={
+            "Pivot_Shaft_8mm": s_shaft, "PillowBlock_KP08_Front": s_kp_f_housing, "PillowBlock_KP08_Rear": s_kp_r_housing,
+            "KP08_Insert_Rings": s_kp_f_ring.fuse(s_kp_r_ring), "Motor_JGB37_520": s_motor,
+            "Motor_Encoder_Rear": s_encoder, "Fastener_Heads_M3": s_fasteners, "IMU_MPU6050": s_imu,
+            "Electronics_Module_Offboard": s_electronics,
+        },
+        frame_name="Square_Frame_140mm", flywheel_name="Brass_Flywheel_90mm",
+    )
+    _export_step([asm], exports_dir / "BalanceCube_1D_Assembly.step")
 
-    # ---------------- Mass & inertia about the pivot vs params_1d_cube.m
-    m_plate, _, I_plate = _mass_props(s_plate, density_kgm3=p.plate_density_kgm3)
-    m_clamp, _, I_clamp = _mass_props(s_clamp, density_kgm3=p.print_density_kgm3)
-    m_shaft, _, I_shaft = _mass_props(s_shaft, density_kgm3=p.steel_density_kgm3)
-    m_wheel, com_wheel, _ = _mass_props(s_wheel_assy, density_kgm3=p.flywheel_density_kgm3)
-    # Wheel spin axis is parallel to the pivot: its own I_yy is the spin inertia (kept separate);
-    # the pendulum only sees it as a point mass at the wheel CoM.
-    I_wheel_pend = m_wheel * ((com_wheel.x * 1e-3) ** 2 + (com_wheel.z * 1e-3) ** 2)
-    I_wheel_spin = s_wheel_local.MatrixOfInertia.A22 * p.flywheel_density_kgm3 * 1e-15
-    motor_and_enc = Part.makeCompound([build_motor_body(p), s_encoder])
-    m_motor, _, I_motor = _mass_props(motor_and_enc, mass_kg=p.motor_mass_kg)
-    m_imu = p.imu_mass_kg
-    I_imu = m_imu * (p.imu_mount_z_mm * 1e-3) ** 2
-    # Fasteners as point masses: 3x M3x8 button (0.9 g), 3x M3x20 SHCS + nut (2.2 g), 2x M3x25 + nut (2.5 g)
-    fast_pts = [(0.9e-3, _motor_hole_xz(p, d)) for d in p.motor_bolt_angles_deg]
-    fast_pts += [(2.2e-3, xz) for xz in CLAMP_BOLT_XZ]
-    fast_pts += [(2.5e-3, (0.0, -10.5))] * 2
-    m_fast = sum(m for m, _ in fast_pts)
-    I_fast = sum(m * ((x * 1e-3) ** 2 + (z * 1e-3) ** 2) for m, (x, z) in fast_pts)
-
-    m_total = m_plate + m_clamp + m_shaft + m_wheel + m_motor + m_imu + m_fast
-    I_pend = I_plate + I_clamp + I_shaft + I_wheel_pend + I_motor + I_imu + I_fast
-
-    # ---------------- Interference & clearance
-    rotating = {"plate": s_plate, "flywheel": s_wheel_assy, "clamp": s_clamp, "motor": s_motor,
-                "encoder": s_encoder, "imu": s_imu, "fasteners": s_fasteners}
-    stationary = {"base": s_base, "pad_L": s_pads[0], "pad_R": s_pads[1], "kp08_F": s_kp_f_housing,
-                  "kp08_R": s_kp_r_housing, "ring_F": s_kp_f_ring, "ring_R": s_kp_r_ring, "electronics": s_electronics}
-    sweep = {}
-    min_clear = {}
-    for deg in range(-45, 46, 5):
-        total_overlap = 0.0
-        for rn, rs in rotating.items():
-            rot = rs.copy()
-            rot.rotate(_v(0, 0, 0), _v(0, 1, 0), float(deg))
-            for sn, ss in stationary.items():
-                d = rot.distToShape(ss)[0]
-                if d < 1e-6:
-                    total_overlap += rot.common(ss).Volume
-                key = f"{rn}~{sn}"
-                if key not in min_clear or d < min_clear[key][0]:
-                    min_clear[key] = (round(d, 3), deg)
-        sweep[f"{deg:+d}deg_overlap_mm3"] = round(float(total_overlap), 4)
-    tightest = dict(sorted(min_clear.items(), key=lambda kv: kv[1][0])[:8])
-
-    # Spinning flywheel (relative motion) vs everything fixed to the pendulum
-    env = _cylinder_y(p.flywheel_outer_radius_mm, y_wheel_center - 0.5 * p.flywheel_rim_thickness_mm,
-                      y_wheel_center + 0.5 * p.flywheel_rim_thickness_mm, (0.0, p.L_center_mm))
-    flywheel_rel = {
-        "envelope_vs_plate_mm": round(env.distToShape(s_plate)[0], 3),
-        "envelope_vs_clamp_mm": round(env.distToShape(s_clamp)[0], 3),
-        "envelope_vs_motor_body_mm": round(env.distToShape(build_motor_body(p))[0], 3),
-        "envelope_vs_imu_mm": round(env.distToShape(s_imu)[0], 3),
-        "flywheel_vs_fastener_heads_mm": round(s_wheel_assy.distToShape(s_fasteners)[0], 3),
-        "dshaft_in_bore_overlap_mm3": round(s_motor.common(s_wheel_assy).Volume, 4),
-        "dshaft_engagement_mm": round(min(0.5 * p.plate_thickness_mm, y_wheel_center + 6.0)
-                                       - max(0.5 * p.plate_thickness_mm - p.motor_shaft_len_mm, y_wheel_center - 6.0), 2),
-        "setscrew_on_shaft": bool(0.5 * p.plate_thickness_mm - p.motor_shaft_len_mm
-                                  < y_wheel_center + p.flywheel_setscrew_y_local_mm - 1.25),
-    }
-
-    # Rest-stop contact at +/-45 deg: plate on TPU pad top
-    stop_contact = {}
-    for deg in (-45.0, 45.0):
-        r = s_plate.copy()
-        r.rotate(_v(0, 0, 0), _v(0, 1, 0), deg)
-        pad = s_pads[0] if deg < 0 else s_pads[1]
-        stop_contact[f"{deg:+.0f}deg"] = {
-            "plate_to_pad_mm": round(r.distToShape(pad)[0], 4),
-            "plate_to_base_mm": round(r.distToShape(s_base)[0], 3),
-        }
-
+    # ---------------- Mass properties, interference sweep, flywheel clearances
+    analysis = analyze_rig(
+        p, plate=s_plate, plate_density=p.plate_density_kgm3,
+        wheel_parts=[(s_wheel_assy, p.flywheel_density_kgm3)], wheel_axis_xz=(0.0, p.L_center_mm),
+        wheel_envelope=(p.flywheel_outer_radius_mm, y_wheel_center - 0.5 * p.flywheel_rim_thickness_mm,
+                        y_wheel_center + 0.5 * p.flywheel_rim_thickness_mm),
+        wheel_bore_y=(y_wheel_center - 0.5 * p.flywheel_rim_thickness_mm, y_wheel_center + 0.5 * p.flywheel_rim_thickness_mm),
+        setscrew_y=y_wheel_center + p.flywheel_setscrew_y_local_mm,
+        clamp=s_clamp, shaft=s_shaft, motor=s_motor, encoder=s_encoder, imu=s_imu, fasteners=s_fasteners,
+        base=s_base, pads=s_pads,
+        others={"kp08_F": s_kp_f_housing, "kp08_R": s_kp_r_housing, "ring_F": s_kp_f_ring, "ring_R": s_kp_r_ring,
+                "electronics": s_electronics},
+    )
+    mi = analysis["mass"]
     report = {
         "params_mm": {
             "square_side_mm": p.square_side_mm,
@@ -859,26 +998,18 @@ def build_all(cad_dir: str | Path | None = None, close_parts_keep_assembly: bool
             "clamp_slot_width_mm": round(p.acrylic_measured_thickness_mm + 2 * p.clamp_slot_clearance_mm, 3),
         },
         "part_validity": validation,
-        "mass_inertia_comparison": {
-            "cad_acrylic_plate_kg": round(m_plate, 5),
-            "cad_clamp_hub_petg_kg": round(m_clamp, 5),
-            "cad_pivot_shaft_kg": round(m_shaft, 5),
-            "cad_brass_flywheel_kg": round(m_wheel, 5),
-            "cad_motor_encoder_kg": round(m_motor, 5),
-            "cad_imu_fasteners_kg": round(m_imu + m_fast, 5),
+        "mass_inertia_comparison": dict(mi, **{
             "params_flywheel_kg": PARAMS_REF["flywheel_kg"],
-            "cad_flywheel_I_spin_kgm2": float(f"{I_wheel_spin:.6e}"),
             "params_flywheel_I_spin_kgm2": PARAMS_REF["flywheel_I_spin_kgm2"],
-            "cad_total_rotating_kg": round(m_total, 4),
             "params_total_kg": PARAMS_REF["total_kg"],
-            "cad_Ip_reduced_kgm2": float(f"{I_pend:.5e}"),
             "params_Ip_reduced_kgm2": PARAMS_REF["Ip_reduced_kgm2"],
-            "Ip_deviation_pct": round(100.0 * (I_pend - PARAMS_REF["Ip_reduced_kgm2"]) / PARAMS_REF["Ip_reduced_kgm2"], 2),
-        },
-        "interference_sweep": sweep,
-        "tightest_clearances_mm_at_deg": tightest,
-        "flywheel_relative_motion": flywheel_rel,
-        "stop_contact": stop_contact,
+            "Ip_deviation_pct": round(100.0 * (mi["cad_Ip_reduced_kgm2"] - PARAMS_REF["Ip_reduced_kgm2"])
+                                      / PARAMS_REF["Ip_reduced_kgm2"], 2),
+        }),
+        "interference_sweep": analysis["sweep"],
+        "tightest_clearances_mm_at_deg": analysis["tightest"],
+        "flywheel_relative_motion": analysis["flywheel_rel"],
+        "stop_contact": analysis["stop_contact"],
     }
     (cad_root / "cad_verification_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 

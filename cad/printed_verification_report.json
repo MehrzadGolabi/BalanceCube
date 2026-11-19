@@ -1,0 +1,155 @@
+{
+  "variant": "all_printed",
+  "params_mm": {
+    "L_center_mm": 83.995,
+    "flywheel_outer_radius_mm": 55.0,
+    "ballast": "12 x M8x20 + 1 nut each",
+    "ballast_circle_radius_mm": 45.32,
+    "flywheel_rim_thickness_mm": 25.6,
+    "flywheel_hub_y_mm": -4.5,
+    "flywheel_far_face_y_mm": -30.6
+  },
+  "part_validity": {
+    "Printed_Frame_140mm": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 115563.8
+    },
+    "Printed_Flywheel_Ballast": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 129508.25
+    }
+  },
+  "flywheel_mass_split_kg": {
+    "petg_body": 0.16448,
+    "steel_ballast": 0.21478,
+    "per_bolt_set_g": 17.9
+  },
+  "ballast_vs_body_interference_mm3": 0.0,
+  "mass_inertia_comparison": {
+    "cad_plate_kg": 0.14677,
+    "cad_clamp_hub_petg_kg": 0.02657,
+    "cad_pivot_shaft_kg": 0.03788,
+    "cad_flywheel_kg": 0.37925,
+    "cad_motor_encoder_kg": 0.155,
+    "cad_imu_fasteners_kg": 0.0193,
+    "cad_flywheel_I_spin_kgm2": 0.0007580133,
+    "cad_flywheel_I_spin_exact_kgm2": 0.0007580132812030828,
+    "cad_total_rotating_kg": 0.7648,
+    "cad_Ip_reduced_kgm2": 0.00527093,
+    "cad_Mgl_Nm": 0.56098,
+    "breakdown": {
+      "plate": {
+        "m_kg": 0.1467660225230606,
+        "z_com_m": 0.08449176386781629,
+        "I_pivot_kgm2": 0.0015279166682351103
+      },
+      "clamp_hub": {
+        "m_kg": 0.026567599985740434,
+        "z_com_m": 0.0029686736132709174,
+        "I_pivot_kgm2": 5.727855731539503e-06
+      },
+      "pivot_shaft": {
+        "m_kg": 0.03788006757992429,
+        "z_com_m": 0.0,
+        "I_pivot_kgm2": 3.030405406393961e-07
+      },
+      "flywheel_point_mass": {
+        "m_kg": 0.3792537579893813,
+        "z_com_m": 0.08399263933133379,
+        "I_pivot_kgm2": 0.002675545554630347
+      },
+      "motor_encoder": {
+        "m_kg": 0.155,
+        "z_com_m": 0.07693031932444787,
+        "I_pivot_kgm2": 0.0009433003284402936
+      },
+      "imu": {
+        "m_kg": 0.005,
+        "z_com_m": 0.14100000000000001,
+        "I_pivot_kgm2": 9.940500000000001e-05
+      },
+      "fasteners": {
+        "m_kg": 0.014300000000000002,
+        "z_com_m": 0.0168661792509451,
+        "I_pivot_kgm2": 1.8730725015305335e-05
+      }
+    }
+  },
+  "interference_sweep": {
+    "-45deg_overlap_mm3": 0.0,
+    "-40deg_overlap_mm3": 0.0,
+    "-35deg_overlap_mm3": 0.0,
+    "-30deg_overlap_mm3": 0.0,
+    "-25deg_overlap_mm3": 0.0,
+    "-20deg_overlap_mm3": 0.0,
+    "-15deg_overlap_mm3": 0.0,
+    "-10deg_overlap_mm3": 0.0,
+    "-5deg_overlap_mm3": 0.0,
+    "+0deg_overlap_mm3": 0.0,
+    "+5deg_overlap_mm3": 0.0,
+    "+10deg_overlap_mm3": 0.0,
+    "+15deg_overlap_mm3": 0.0,
+    "+20deg_overlap_mm3": 0.0,
+    "+25deg_overlap_mm3": 0.0,
+    "+30deg_overlap_mm3": 0.0,
+    "+35deg_overlap_mm3": 0.0,
+    "+40deg_overlap_mm3": 0.0,
+    "+45deg_overlap_mm3": 0.0
+  },
+  "tightest_clearances_mm_at_deg": {
+    "plate~pad_L": [
+      0.0,
+      -45
+    ],
+    "plate~pad_R": [
+      0.0,
+      45
+    ],
+    "plate~base": [
+      1.5,
+      -45
+    ],
+    "clamp~base": [
+      3.0,
+      -45
+    ],
+    "clamp~ring_F": [
+      3.5,
+      -45
+    ],
+    "clamp~ring_R": [
+      3.5,
+      -45
+    ],
+    "clamp~kp08_F": [
+      5.5,
+      -45
+    ],
+    "clamp~kp08_R": [
+      5.5,
+      45
+    ]
+  },
+  "flywheel_relative_motion": {
+    "envelope_vs_plate_mm": 1.5,
+    "envelope_vs_clamp_mm": 5.495,
+    "envelope_vs_motor_body_mm": 5.0,
+    "envelope_vs_imu_mm": 7.507,
+    "flywheel_vs_fastener_heads_mm": 1.744,
+    "dshaft_in_bore_overlap_mm3": 0.0,
+    "dshaft_engagement_mm": 7.5,
+    "setscrew_on_shaft": true
+  },
+  "stop_contact": {
+    "-45deg": {
+      "plate_to_pad_mm": 0.0,
+      "plate_to_base_mm": 1.5
+    },
+    "+45deg": {
+      "plate_to_pad_mm": 0.0,
+      "plate_to_base_mm": 1.5
+    }
+  }
+}

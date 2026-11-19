@@ -35,18 +35,57 @@
     }
   },
   "mass_inertia_comparison": {
-    "cad_acrylic_plate_kg": 0.13767,
+    "cad_plate_kg": 0.13767,
     "cad_clamp_hub_petg_kg": 0.02657,
     "cad_pivot_shaft_kg": 0.03788,
-    "cad_brass_flywheel_kg": 0.39711,
+    "cad_flywheel_kg": 0.39711,
     "cad_motor_encoder_kg": 0.155,
     "cad_imu_fasteners_kg": 0.0193,
-    "params_flywheel_kg": 0.38721,
     "cad_flywheel_I_spin_kgm2": 0.0005109285,
-    "params_flywheel_I_spin_kgm2": 0.0005143,
+    "cad_flywheel_I_spin_exact_kgm2": 0.0005109285181394378,
     "cad_total_rotating_kg": 0.7735,
-    "params_total_kg": 0.7272,
     "cad_Ip_reduced_kgm2": 0.00530143,
+    "cad_Mgl_Nm": 0.56811,
+    "breakdown": {
+      "plate": {
+        "m_kg": 0.13766725713818895,
+        "z_com_m": 0.08446171643190761,
+        "I_pivot_kgm2": 0.0014324660547321941
+      },
+      "clamp_hub": {
+        "m_kg": 0.026567599985740434,
+        "z_com_m": 0.0029686736132709174,
+        "I_pivot_kgm2": 5.727855731539503e-06
+      },
+      "pivot_shaft": {
+        "m_kg": 0.03788006757992429,
+        "z_com_m": 0.0,
+        "I_pivot_kgm2": 3.030405406393961e-07
+      },
+      "flywheel_point_mass": {
+        "m_kg": 0.3971063029195693,
+        "z_com_m": 0.08399271854043597,
+        "I_pivot_kgm2": 0.002801496320196542
+      },
+      "motor_encoder": {
+        "m_kg": 0.155,
+        "z_com_m": 0.07693031932444787,
+        "I_pivot_kgm2": 0.0009433003284402936
+      },
+      "imu": {
+        "m_kg": 0.005,
+        "z_com_m": 0.14100000000000001,
+        "I_pivot_kgm2": 9.940500000000001e-05
+      },
+      "fasteners": {
+        "m_kg": 0.014300000000000002,
+        "z_com_m": 0.0168661792509451,
+        "I_pivot_kgm2": 1.8730725015305335e-05
+      }
+    },
+    "params_flywheel_kg": 0.38721,
+    "params_flywheel_I_spin_kgm2": 0.0005143,
+    "params_total_kg": 0.7272,
     "params_Ip_reduced_kgm2": 0.00577,
     "Ip_deviation_pct": -8.12
   },
