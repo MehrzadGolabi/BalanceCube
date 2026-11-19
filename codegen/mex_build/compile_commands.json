@@ -1,0 +1,56 @@
+[
+  {
+    "directory": "/home/thanotos/BalanceCube/codegen/mex_build",
+    "command": "/usr/bin/gcc -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fwrapv -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -DNDEBUG -fno-predictive-commoning -std=c99 -I \".\" -I \"/home/thanotos/BalanceCube/codegen\" -I \"./interface\" -I \"/usr/local/MATLAB/R2025b/extern/include\" -I \".\" -DMODEL=balanceCubeControllerStep_mex -msse2 -fno-predictive-commoning -Wno-stringop-overflow -Wno-maybe-uninitialized -c  balanceCubeControllerStep_data.c -o build/glnxa64/balanceCubeControllerStep_data.o",
+    "file": "balanceCubeControllerStep_data.c",
+    "output": "build/glnxa64/balanceCubeControllerStep_data.o"
+  },
+  {
+    "directory": "/home/thanotos/BalanceCube/codegen/mex_build",
+    "command": "/usr/bin/gcc -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fwrapv -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -DNDEBUG -fno-predictive-commoning -std=c99 -I \".\" -I \"/home/thanotos/BalanceCube/codegen\" -I \"./interface\" -I \"/usr/local/MATLAB/R2025b/extern/include\" -I \".\" -DMODEL=balanceCubeControllerStep_mex -msse2 -fno-predictive-commoning -Wno-stringop-overflow -Wno-maybe-uninitialized -c  rt_nonfinite.c -o build/glnxa64/rt_nonfinite.o",
+    "file": "rt_nonfinite.c",
+    "output": "build/glnxa64/rt_nonfinite.o"
+  },
+  {
+    "directory": "/home/thanotos/BalanceCube/codegen/mex_build",
+    "command": "/usr/bin/gcc -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fwrapv -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -DNDEBUG -fno-predictive-commoning -std=c99 -I \".\" -I \"/home/thanotos/BalanceCube/codegen\" -I \"./interface\" -I \"/usr/local/MATLAB/R2025b/extern/include\" -I \".\" -DMODEL=balanceCubeControllerStep_mex -msse2 -fno-predictive-commoning -Wno-stringop-overflow -Wno-maybe-uninitialized -c  balanceCubeControllerStep_initialize.c -o build/glnxa64/balanceCubeControllerStep_initialize.o",
+    "file": "balanceCubeControllerStep_initialize.c",
+    "output": "build/glnxa64/balanceCubeControllerStep_initialize.o"
+  },
+  {
+    "directory": "/home/thanotos/BalanceCube/codegen/mex_build",
+    "command": "/usr/bin/gcc -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fwrapv -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -DNDEBUG -fno-predictive-commoning -std=c99 -I \".\" -I \"/home/thanotos/BalanceCube/codegen\" -I \"./interface\" -I \"/usr/local/MATLAB/R2025b/extern/include\" -I \".\" -DMODEL=balanceCubeControllerStep_mex -msse2 -fno-predictive-commoning -Wno-stringop-overflow -Wno-maybe-uninitialized -c  balanceCubeControllerStep_terminate.c -o build/glnxa64/balanceCubeControllerStep_terminate.o",
+    "file": "balanceCubeControllerStep_terminate.c",
+    "output": "build/glnxa64/balanceCubeControllerStep_terminate.o"
+  },
+  {
+    "directory": "/home/thanotos/BalanceCube/codegen/mex_build",
+    "command": "/usr/bin/gcc -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fwrapv -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -DNDEBUG -fno-predictive-commoning -std=c99 -I \".\" -I \"/home/thanotos/BalanceCube/codegen\" -I \"./interface\" -I \"/usr/local/MATLAB/R2025b/extern/include\" -I \".\" -DMODEL=balanceCubeControllerStep_mex -msse2 -fno-predictive-commoning -Wno-stringop-overflow -Wno-maybe-uninitialized -c  balanceCubeControllerStep.c -o build/glnxa64/balanceCubeControllerStep.o",
+    "file": "balanceCubeControllerStep.c",
+    "output": "build/glnxa64/balanceCubeControllerStep.o"
+  },
+  {
+    "directory": "/home/thanotos/BalanceCube/codegen/mex_build",
+    "command": "/usr/bin/gcc -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fwrapv -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -DNDEBUG -fno-predictive-commoning -std=c99 -I \".\" -I \"/home/thanotos/BalanceCube/codegen\" -I \"./interface\" -I \"/usr/local/MATLAB/R2025b/extern/include\" -I \".\" -DMODEL=balanceCubeControllerStep_mex -msse2 -fno-predictive-commoning -Wno-stringop-overflow -Wno-maybe-uninitialized -c  interface/_coder_balanceCubeControllerStep_api.c -o build/glnxa64/_coder_balanceCubeControllerStep_api.o",
+    "file": "interface/_coder_balanceCubeControllerStep_api.c",
+    "output": "build/glnxa64/_coder_balanceCubeControllerStep_api.o"
+  },
+  {
+    "directory": "/home/thanotos/BalanceCube/codegen/mex_build",
+    "command": "/usr/bin/gcc -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fwrapv -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -DNDEBUG -fno-predictive-commoning -std=c99 -I \".\" -I \"/home/thanotos/BalanceCube/codegen\" -I \"./interface\" -I \"/usr/local/MATLAB/R2025b/extern/include\" -I \".\" -DMODEL=balanceCubeControllerStep_mex -msse2 -fno-predictive-commoning -Wno-stringop-overflow -Wno-maybe-uninitialized -c  interface/_coder_balanceCubeControllerStep_mex.c -o build/glnxa64/_coder_balanceCubeControllerStep_mex.o",
+    "file": "interface/_coder_balanceCubeControllerStep_mex.c",
+    "output": "build/glnxa64/_coder_balanceCubeControllerStep_mex.o"
+  },
+  {
+    "directory": "/home/thanotos/BalanceCube/codegen/mex_build",
+    "command": "/usr/bin/gcc -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fwrapv -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -DNDEBUG -fno-predictive-commoning -std=c99 -I \".\" -I \"/home/thanotos/BalanceCube/codegen\" -I \"./interface\" -I \"/usr/local/MATLAB/R2025b/extern/include\" -I \".\" -DMODEL=balanceCubeControllerStep_mex -msse2 -fno-predictive-commoning -Wno-stringop-overflow -Wno-maybe-uninitialized -c  interface/_coder_balanceCubeControllerStep_info.c -o build/glnxa64/_coder_balanceCubeControllerStep_info.o",
+    "file": "interface/_coder_balanceCubeControllerStep_info.c",
+    "output": "build/glnxa64/_coder_balanceCubeControllerStep_info.o"
+  },
+  {
+    "directory": "/home/thanotos/BalanceCube/codegen/mex_build",
+    "command": "/usr/bin/gcc -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fwrapv -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -DNDEBUG -fno-predictive-commoning -std=c99 -I \".\" -I \"/home/thanotos/BalanceCube/codegen\" -I \"./interface\" -I \"/usr/local/MATLAB/R2025b/extern/include\" -I \".\" -DMODEL=balanceCubeControllerStep_mex -msse2 -fno-predictive-commoning -Wno-stringop-overflow -Wno-maybe-uninitialized -c  /usr/local/MATLAB/R2025b/extern/version/c_mexapi_version.c -o build/glnxa64/c_mexapi_version.o",
+    "file": "/usr/local/MATLAB/R2025b/extern/version/c_mexapi_version.c",
+    "output": "build/glnxa64/c_mexapi_version.o"
+  }
+]

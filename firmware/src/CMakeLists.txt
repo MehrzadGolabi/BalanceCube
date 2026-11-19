@@ -1,0 +1,14 @@
+idf_component_register(
+    SRCS
+        "main.c"
+        "app_controller.c"
+        "cli_tuning.c"
+        "hal_esp32.c"
+        "../balance_controller_c/balanceCubeControllerStep.c"
+        "../balance_controller_c/balanceCubeControllerStep_data.c"
+        "../balance_controller_c/balanceCubeControllerStep_initialize.c"
+        "../balance_controller_c/balanceCubeControllerStep_terminate.c"
+    INCLUDE_DIRS
+        "../include"
+        "../balance_controller_c"
+)

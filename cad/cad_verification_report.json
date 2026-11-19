@@ -1,0 +1,128 @@
+{
+  "params_mm": {
+    "square_side_mm": 140.0,
+    "L_center_mm": 83.995,
+    "stop_contact_z_mm": -10.6066,
+    "stop_pillar_top_z_mm": -12.1066,
+    "flywheel_y_center_mm": -11.0,
+    "clamp_slot_width_mm": 6.3
+  },
+  "part_validity": {
+    "Square_Frame_140mm": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 115686.77
+    },
+    "Brass_Flywheel_90mm": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 46718.39
+    },
+    "Pivot_Clamp_Hub": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 20919.37
+    },
+    "Base_And_Stops": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 156503.6
+    },
+    "Stop_Pad_TPU": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 473.7
+    }
+  },
+  "mass_inertia_comparison": {
+    "cad_acrylic_plate_kg": 0.13767,
+    "cad_clamp_hub_petg_kg": 0.02657,
+    "cad_pivot_shaft_kg": 0.03788,
+    "cad_brass_flywheel_kg": 0.39711,
+    "cad_motor_encoder_kg": 0.155,
+    "cad_imu_fasteners_kg": 0.0193,
+    "params_flywheel_kg": 0.38721,
+    "cad_flywheel_I_spin_kgm2": 0.0005109285,
+    "params_flywheel_I_spin_kgm2": 0.0005143,
+    "cad_total_rotating_kg": 0.7735,
+    "params_total_kg": 0.7272,
+    "cad_Ip_reduced_kgm2": 0.00530143,
+    "params_Ip_reduced_kgm2": 0.00577,
+    "Ip_deviation_pct": -8.12
+  },
+  "interference_sweep": {
+    "-45deg_overlap_mm3": 0.0,
+    "-40deg_overlap_mm3": 0.0,
+    "-35deg_overlap_mm3": 0.0,
+    "-30deg_overlap_mm3": 0.0,
+    "-25deg_overlap_mm3": 0.0,
+    "-20deg_overlap_mm3": 0.0,
+    "-15deg_overlap_mm3": 0.0,
+    "-10deg_overlap_mm3": 0.0,
+    "-5deg_overlap_mm3": 0.0,
+    "+0deg_overlap_mm3": 0.0,
+    "+5deg_overlap_mm3": 0.0,
+    "+10deg_overlap_mm3": 0.0,
+    "+15deg_overlap_mm3": 0.0,
+    "+20deg_overlap_mm3": 0.0,
+    "+25deg_overlap_mm3": 0.0,
+    "+30deg_overlap_mm3": 0.0,
+    "+35deg_overlap_mm3": 0.0,
+    "+40deg_overlap_mm3": 0.0,
+    "+45deg_overlap_mm3": 0.0
+  },
+  "tightest_clearances_mm_at_deg": {
+    "plate~pad_L": [
+      0.0,
+      -45
+    ],
+    "plate~pad_R": [
+      0.0,
+      45
+    ],
+    "plate~base": [
+      1.5,
+      -45
+    ],
+    "clamp~base": [
+      3.0,
+      -45
+    ],
+    "clamp~ring_F": [
+      3.5,
+      -45
+    ],
+    "clamp~ring_R": [
+      3.5,
+      -45
+    ],
+    "clamp~kp08_F": [
+      5.5,
+      -45
+    ],
+    "clamp~kp08_R": [
+      5.5,
+      45
+    ]
+  },
+  "flywheel_relative_motion": {
+    "envelope_vs_plate_mm": 2.0,
+    "envelope_vs_clamp_mm": 15.495,
+    "envelope_vs_motor_body_mm": 5.5,
+    "envelope_vs_imu_mm": 11.706,
+    "flywheel_vs_fastener_heads_mm": 2.773,
+    "dshaft_in_bore_overlap_mm3": 0.0,
+    "dshaft_engagement_mm": 7.0,
+    "setscrew_on_shaft": true
+  },
+  "stop_contact": {
+    "-45deg": {
+      "plate_to_pad_mm": 0.0,
+      "plate_to_base_mm": 1.5
+    },
+    "+45deg": {
+      "plate_to_pad_mm": 0.0,
+      "plate_to_base_mm": 1.5
+    }
+  }
+}

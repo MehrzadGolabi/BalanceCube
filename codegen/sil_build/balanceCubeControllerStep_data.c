@@ -1,0 +1,18 @@
+/*
+ * File: balanceCubeControllerStep_data.c
+ *
+ * MATLAB Coder version            : 25.2
+ * C/C++ source code generated on  : 18-Nov-2026 06:08:59
+ */
+
+/* Include Files */
+#include "balanceCubeControllerStep_data.h"
+
+/* Variable Definitions */
+boolean_T isInitialized_balanceCubeControllerStep = false;
+
+/*
+ * File trailer for balanceCubeControllerStep_data.c
+ *
+ * [EOF]
+ */

@@ -1,0 +1,386 @@
+/*
+ * _coder_balanceCubeControllerStep_api.c
+ *
+ * Code generation for function '_coder_balanceCubeControllerStep_api'
+ *
+ */
+
+/* Include files */
+#include "_coder_balanceCubeControllerStep_api.h"
+#include "balanceCubeControllerStep.h"
+#include "balanceCubeControllerStep_data.h"
+#include "balanceCubeControllerStep_types.h"
+#include "rt_nonfinite.h"
+
+/* Function Declarations */
+static real32_T b_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u,
+                                   const emlrtMsgIdentifier *parentId);
+
+static const mxArray *b_emlrt_marshallOut(const boolean_T u);
+
+static int32_T c_emlrt_marshallIn(const emlrtStack *sp, const mxArray *nullptr,
+                                  const char_T *identifier);
+
+static const mxArray *c_emlrt_marshallOut(const uint8_T u);
+
+static int32_T d_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u,
+                                  const emlrtMsgIdentifier *parentId);
+
+static boolean_T e_emlrt_marshallIn(const emlrtStack *sp,
+                                    const mxArray *nullptr,
+                                    const char_T *identifier);
+
+static real32_T emlrt_marshallIn(const emlrtStack *sp, const mxArray *nullptr,
+                                 const char_T *identifier);
+
+static const mxArray *emlrt_marshallOut(const real32_T u);
+
+static boolean_T f_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u,
+                                    const emlrtMsgIdentifier *parentId);
+
+static BalanceCubeConfig_T g_emlrt_marshallIn(const emlrtStack *sp,
+                                              const mxArray *nullptr,
+                                              const char_T *identifier);
+
+static BalanceCubeConfig_T
+h_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u,
+                   const emlrtMsgIdentifier *parentId);
+
+static void i_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u,
+                               const emlrtMsgIdentifier *parentId,
+                               real32_T y[4]);
+
+static real32_T j_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
+                                   const emlrtMsgIdentifier *msgId);
+
+static int32_T k_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
+                                  const emlrtMsgIdentifier *msgId);
+
+static boolean_T l_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
+                                    const emlrtMsgIdentifier *msgId);
+
+static void m_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
+                               const emlrtMsgIdentifier *msgId,
+                               real32_T ret[4]);
+
+/* Function Definitions */
+static real32_T b_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u,
+                                   const emlrtMsgIdentifier *parentId)
+{
+  real32_T y;
+  y = j_emlrt_marshallIn(sp, emlrtAlias(u), parentId);
+  emlrtDestroyArray(&u);
+  return y;
+}
+
+static const mxArray *b_emlrt_marshallOut(const boolean_T u)
+{
+  const mxArray *m;
+  const mxArray *y;
+  y = NULL;
+  m = emlrtCreateLogicalScalar(u);
+  emlrtAssign(&y, m);
+  return y;
+}
+
+static int32_T c_emlrt_marshallIn(const emlrtStack *sp, const mxArray *nullptr,
+                                  const char_T *identifier)
+{
+  emlrtMsgIdentifier thisId;
+  int32_T y;
+  thisId.fIdentifier = (const char_T *)identifier;
+  thisId.fParent = NULL;
+  thisId.bParentIsCell = false;
+  y = d_emlrt_marshallIn(sp, emlrtAlias(nullptr), &thisId);
+  emlrtDestroyArray(&nullptr);
+  return y;
+}
+
+static const mxArray *c_emlrt_marshallOut(const uint8_T u)
+{
+  const mxArray *m;
+  const mxArray *y;
+  y = NULL;
+  m = emlrtCreateNumericMatrix(1, 1, mxUINT8_CLASS, mxREAL);
+  *(uint8_T *)emlrtMxGetData(m) = u;
+  emlrtAssign(&y, m);
+  return y;
+}
+
+static int32_T d_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u,
+                                  const emlrtMsgIdentifier *parentId)
+{
+  int32_T y;
+  y = k_emlrt_marshallIn(sp, emlrtAlias(u), parentId);
+  emlrtDestroyArray(&u);
+  return y;
+}
+
+static boolean_T e_emlrt_marshallIn(const emlrtStack *sp,
+                                    const mxArray *nullptr,
+                                    const char_T *identifier)
+{
+  emlrtMsgIdentifier thisId;
+  boolean_T y;
+  thisId.fIdentifier = (const char_T *)identifier;
+  thisId.fParent = NULL;
+  thisId.bParentIsCell = false;
+  y = f_emlrt_marshallIn(sp, emlrtAlias(nullptr), &thisId);
+  emlrtDestroyArray(&nullptr);
+  return y;
+}
+
+static real32_T emlrt_marshallIn(const emlrtStack *sp, const mxArray *nullptr,
+                                 const char_T *identifier)
+{
+  emlrtMsgIdentifier thisId;
+  real32_T y;
+  thisId.fIdentifier = (const char_T *)identifier;
+  thisId.fParent = NULL;
+  thisId.bParentIsCell = false;
+  y = b_emlrt_marshallIn(sp, emlrtAlias(nullptr), &thisId);
+  emlrtDestroyArray(&nullptr);
+  return y;
+}
+
+static const mxArray *emlrt_marshallOut(const real32_T u)
+{
+  const mxArray *m;
+  const mxArray *y;
+  y = NULL;
+  m = emlrtCreateNumericMatrix(1, 1, mxSINGLE_CLASS, mxREAL);
+  *(real32_T *)emlrtMxGetData(m) = u;
+  emlrtAssign(&y, m);
+  return y;
+}
+
+static boolean_T f_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u,
+                                    const emlrtMsgIdentifier *parentId)
+{
+  boolean_T y;
+  y = l_emlrt_marshallIn(sp, emlrtAlias(u), parentId);
+  emlrtDestroyArray(&u);
+  return y;
+}
+
+static BalanceCubeConfig_T g_emlrt_marshallIn(const emlrtStack *sp,
+                                              const mxArray *nullptr,
+                                              const char_T *identifier)
+{
+  BalanceCubeConfig_T y;
+  emlrtMsgIdentifier thisId;
+  thisId.fIdentifier = (const char_T *)identifier;
+  thisId.fParent = NULL;
+  thisId.bParentIsCell = false;
+  y = h_emlrt_marshallIn(sp, emlrtAlias(nullptr), &thisId);
+  emlrtDestroyArray(&nullptr);
+  return y;
+}
+
+static BalanceCubeConfig_T
+h_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u,
+                   const emlrtMsgIdentifier *parentId)
+{
+  static const int32_T dims = 0;
+  static const char_T *fieldNames[13] = {"Ts",
+                                         "imuRotated45deg",
+                                         "skipCalib",
+                                         "mountTrimRad",
+                                         "cpr4x",
+                                         "encLpfBeta",
+                                         "cfAlpha",
+                                         "engageAngleRad",
+                                         "catchLimitRad",
+                                         "K",
+                                         "VmaxEff",
+                                         "Vdeadband",
+                                         "intWMax"};
+  BalanceCubeConfig_T y;
+  emlrtMsgIdentifier thisId;
+  thisId.fParent = parentId;
+  thisId.bParentIsCell = false;
+  emlrtCheckStructR2012b((emlrtConstCTX)sp, parentId, u, 13,
+                         (const char_T **)&fieldNames[0], 0U,
+                         (const void *)&dims);
+  thisId.fIdentifier = "Ts";
+  y.Ts = b_emlrt_marshallIn(
+      sp, emlrtAlias(emlrtGetFieldR2017b((emlrtConstCTX)sp, u, 0, 0, "Ts")),
+      &thisId);
+  thisId.fIdentifier = "imuRotated45deg";
+  y.imuRotated45deg =
+      f_emlrt_marshallIn(sp,
+                         emlrtAlias(emlrtGetFieldR2017b((emlrtConstCTX)sp, u, 0,
+                                                        1, "imuRotated45deg")),
+                         &thisId);
+  thisId.fIdentifier = "skipCalib";
+  y.skipCalib = f_emlrt_marshallIn(
+      sp,
+      emlrtAlias(emlrtGetFieldR2017b((emlrtConstCTX)sp, u, 0, 2, "skipCalib")),
+      &thisId);
+  thisId.fIdentifier = "mountTrimRad";
+  y.mountTrimRad =
+      b_emlrt_marshallIn(sp,
+                         emlrtAlias(emlrtGetFieldR2017b((emlrtConstCTX)sp, u, 0,
+                                                        3, "mountTrimRad")),
+                         &thisId);
+  thisId.fIdentifier = "cpr4x";
+  y.cpr4x = b_emlrt_marshallIn(
+      sp, emlrtAlias(emlrtGetFieldR2017b((emlrtConstCTX)sp, u, 0, 4, "cpr4x")),
+      &thisId);
+  thisId.fIdentifier = "encLpfBeta";
+  y.encLpfBeta = b_emlrt_marshallIn(
+      sp,
+      emlrtAlias(emlrtGetFieldR2017b((emlrtConstCTX)sp, u, 0, 5, "encLpfBeta")),
+      &thisId);
+  thisId.fIdentifier = "cfAlpha";
+  y.cfAlpha = b_emlrt_marshallIn(
+      sp,
+      emlrtAlias(emlrtGetFieldR2017b((emlrtConstCTX)sp, u, 0, 6, "cfAlpha")),
+      &thisId);
+  thisId.fIdentifier = "engageAngleRad";
+  y.engageAngleRad =
+      b_emlrt_marshallIn(sp,
+                         emlrtAlias(emlrtGetFieldR2017b((emlrtConstCTX)sp, u, 0,
+                                                        7, "engageAngleRad")),
+                         &thisId);
+  thisId.fIdentifier = "catchLimitRad";
+  y.catchLimitRad =
+      b_emlrt_marshallIn(sp,
+                         emlrtAlias(emlrtGetFieldR2017b((emlrtConstCTX)sp, u, 0,
+                                                        8, "catchLimitRad")),
+                         &thisId);
+  thisId.fIdentifier = "K";
+  i_emlrt_marshallIn(
+      sp, emlrtAlias(emlrtGetFieldR2017b((emlrtConstCTX)sp, u, 0, 9, "K")),
+      &thisId, y.K);
+  thisId.fIdentifier = "VmaxEff";
+  y.VmaxEff = b_emlrt_marshallIn(
+      sp,
+      emlrtAlias(emlrtGetFieldR2017b((emlrtConstCTX)sp, u, 0, 10, "VmaxEff")),
+      &thisId);
+  thisId.fIdentifier = "Vdeadband";
+  y.Vdeadband = b_emlrt_marshallIn(
+      sp,
+      emlrtAlias(emlrtGetFieldR2017b((emlrtConstCTX)sp, u, 0, 11, "Vdeadband")),
+      &thisId);
+  thisId.fIdentifier = "intWMax";
+  y.intWMax = b_emlrt_marshallIn(
+      sp,
+      emlrtAlias(emlrtGetFieldR2017b((emlrtConstCTX)sp, u, 0, 12, "intWMax")),
+      &thisId);
+  emlrtDestroyArray(&u);
+  return y;
+}
+
+static void i_emlrt_marshallIn(const emlrtStack *sp, const mxArray *u,
+                               const emlrtMsgIdentifier *parentId,
+                               real32_T y[4])
+{
+  m_emlrt_marshallIn(sp, emlrtAlias(u), parentId, y);
+  emlrtDestroyArray(&u);
+}
+
+static real32_T j_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
+                                   const emlrtMsgIdentifier *msgId)
+{
+  static const int32_T dims = 0;
+  real32_T ret;
+  emlrtCheckBuiltInR2012b((emlrtConstCTX)sp, msgId, src, "single", false, 0U,
+                          (const void *)&dims);
+  ret = *(real32_T *)emlrtMxGetData(src);
+  emlrtDestroyArray(&src);
+  return ret;
+}
+
+static int32_T k_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
+                                  const emlrtMsgIdentifier *msgId)
+{
+  static const int32_T dims = 0;
+  int32_T ret;
+  emlrtCheckBuiltInR2012b((emlrtConstCTX)sp, msgId, src, "int32", false, 0U,
+                          (const void *)&dims);
+  ret = *(int32_T *)emlrtMxGetData(src);
+  emlrtDestroyArray(&src);
+  return ret;
+}
+
+static boolean_T l_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
+                                    const emlrtMsgIdentifier *msgId)
+{
+  static const int32_T dims = 0;
+  boolean_T ret;
+  emlrtCheckBuiltInR2012b((emlrtConstCTX)sp, msgId, src, "logical", false, 0U,
+                          (const void *)&dims);
+  ret = *emlrtMxGetLogicals(src);
+  emlrtDestroyArray(&src);
+  return ret;
+}
+
+static void m_emlrt_marshallIn(const emlrtStack *sp, const mxArray *src,
+                               const emlrtMsgIdentifier *msgId, real32_T ret[4])
+{
+  static const int32_T dims[2] = {1, 4};
+  real32_T(*r)[4];
+  emlrtCheckBuiltInR2012b((emlrtConstCTX)sp, msgId, src, "single", false, 2U,
+                          (const void *)&dims[0]);
+  r = (real32_T(*)[4])emlrtMxGetData(src);
+  ret[0] = (*r)[0];
+  ret[1] = (*r)[1];
+  ret[2] = (*r)[2];
+  ret[3] = (*r)[3];
+  emlrtDestroyArray(&src);
+}
+
+void balanceCubeControllerStep_api(const mxArray *const prhs[6], int32_T nlhs,
+                                   const mxArray *plhs[6])
+{
+  BalanceCubeConfig_T cfgParams;
+  emlrtStack st = {
+      NULL, /* site */
+      NULL, /* tls */
+      NULL  /* prev */
+  };
+  int32_T encTicksDelta;
+  real32_T axMps2;
+  real32_T ayMps2;
+  real32_T gzRads;
+  real32_T omegaWRads;
+  real32_T pwmDuty;
+  real32_T thetaHatDeg;
+  uint8_T modeOut;
+  boolean_T in1High;
+  boolean_T in2High;
+  boolean_T resetState;
+  st.tls = emlrtRootTLSGlobal;
+  /* Marshall function inputs */
+  axMps2 = emlrt_marshallIn(&st, emlrtAliasP(prhs[0]), "axMps2");
+  ayMps2 = emlrt_marshallIn(&st, emlrtAliasP(prhs[1]), "ayMps2");
+  gzRads = emlrt_marshallIn(&st, emlrtAliasP(prhs[2]), "gzRads");
+  encTicksDelta =
+      c_emlrt_marshallIn(&st, emlrtAliasP(prhs[3]), "encTicksDelta");
+  resetState = e_emlrt_marshallIn(&st, emlrtAliasP(prhs[4]), "resetState");
+  cfgParams = g_emlrt_marshallIn(&st, emlrtAliasP(prhs[5]), "cfgParams");
+  /* Invoke the target function */
+  balanceCubeControllerStep(&st, axMps2, ayMps2, gzRads, encTicksDelta,
+                            resetState, &cfgParams, &pwmDuty, &in1High,
+                            &in2High, &modeOut, &thetaHatDeg, &omegaWRads);
+  /* Marshall function outputs */
+  plhs[0] = emlrt_marshallOut(pwmDuty);
+  if (nlhs > 1) {
+    plhs[1] = b_emlrt_marshallOut(in1High);
+  }
+  if (nlhs > 2) {
+    plhs[2] = b_emlrt_marshallOut(in2High);
+  }
+  if (nlhs > 3) {
+    plhs[3] = c_emlrt_marshallOut(modeOut);
+  }
+  if (nlhs > 4) {
+    plhs[4] = emlrt_marshallOut(thetaHatDeg);
+  }
+  if (nlhs > 5) {
+    plhs[5] = emlrt_marshallOut(omegaWRads);
+  }
+}
+
+/* End of code generation (_coder_balanceCubeControllerStep_api.c) */

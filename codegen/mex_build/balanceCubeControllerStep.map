@@ -1,0 +1,12 @@
+MEX {
+	global:
+		mexFunction;
+		mexfilerequiredapiversion;
+		emlrtMexFcnProperties;
+		balanceCubeControllerStep;
+		balanceCubeControllerStep_initialize;
+		balanceCubeControllerStep_terminate;
+		balanceCubeControllerStep_atexit;
+	local:
+		*;
+};

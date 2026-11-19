@@ -1,0 +1,32 @@
+[
+  {
+    "directory": "/home/thanotos/BalanceCube/codegen/sil_build/sil",
+    "command": "/usr/bin/gcc -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fwrapv -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -DNDEBUG -fno-predictive-commoning -std=c99 -I \"/home/thanotos/BalanceCube/codegen\" -I \"../interface\" -I \"..\" -I \"/usr/local/MATLAB/R2025b/toolbox/coder/rtiostream/src/utils_host\" -I \"/usr/local/MATLAB/R2025b/extern/include\" -I \".\" -DMODEL=balanceCubeControllerStep_sil -DMATLAB_MEX_FILE -Wno-stringop-overflow -Wno-maybe-uninitialized -c  balanceCubeControllerStep_sil.c -o build/glnxa64/balanceCubeControllerStep_sil.o",
+    "file": "balanceCubeControllerStep_sil.c",
+    "output": "build/glnxa64/balanceCubeControllerStep_sil.o"
+  },
+  {
+    "directory": "/home/thanotos/BalanceCube/codegen/sil_build/sil",
+    "command": "/usr/bin/gcc -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fwrapv -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -DNDEBUG -fno-predictive-commoning -std=c99 -I \"/home/thanotos/BalanceCube/codegen\" -I \"../interface\" -I \"..\" -I \"/usr/local/MATLAB/R2025b/toolbox/coder/rtiostream/src/utils_host\" -I \"/usr/local/MATLAB/R2025b/extern/include\" -I \".\" -DMODEL=balanceCubeControllerStep_sil -DMATLAB_MEX_FILE -Wno-stringop-overflow -Wno-maybe-uninitialized -c  ../interface/_coder_balanceCubeControllerStep_info.c -o build/glnxa64/_coder_balanceCubeControllerStep_info.o",
+    "file": "../interface/_coder_balanceCubeControllerStep_info.c",
+    "output": "build/glnxa64/_coder_balanceCubeControllerStep_info.o"
+  },
+  {
+    "directory": "/home/thanotos/BalanceCube/codegen/sil_build/sil",
+    "command": "/usr/bin/gcc -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fwrapv -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -DNDEBUG -fno-predictive-commoning -std=c99 -I \"/home/thanotos/BalanceCube/codegen\" -I \"../interface\" -I \"..\" -I \"/usr/local/MATLAB/R2025b/toolbox/coder/rtiostream/src/utils_host\" -I \"/usr/local/MATLAB/R2025b/extern/include\" -I \".\" -DMODEL=balanceCubeControllerStep_sil -DMATLAB_MEX_FILE -Wno-stringop-overflow -Wno-maybe-uninitialized -c  ../interface/_coder_balanceCubeControllerStep_api.c -o build/glnxa64/_coder_balanceCubeControllerStep_api.o",
+    "file": "../interface/_coder_balanceCubeControllerStep_api.c",
+    "output": "build/glnxa64/_coder_balanceCubeControllerStep_api.o"
+  },
+  {
+    "directory": "/home/thanotos/BalanceCube/codegen/sil_build/sil",
+    "command": "/usr/bin/gcc -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fwrapv -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -DNDEBUG -fno-predictive-commoning -std=c99 -I \"/home/thanotos/BalanceCube/codegen\" -I \"../interface\" -I \"..\" -I \"/usr/local/MATLAB/R2025b/toolbox/coder/rtiostream/src/utils_host\" -I \"/usr/local/MATLAB/R2025b/extern/include\" -I \".\" -DMODEL=balanceCubeControllerStep_sil -DMATLAB_MEX_FILE -Wno-stringop-overflow -Wno-maybe-uninitialized -c  ../interface/_coder_balanceCubeControllerStep_mex.c -o build/glnxa64/_coder_balanceCubeControllerStep_mex.o",
+    "file": "../interface/_coder_balanceCubeControllerStep_mex.c",
+    "output": "build/glnxa64/_coder_balanceCubeControllerStep_mex.o"
+  },
+  {
+    "directory": "/home/thanotos/BalanceCube/codegen/sil_build/sil",
+    "command": "/usr/bin/gcc -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fwrapv -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -DNDEBUG -fno-predictive-commoning -std=c99 -I \"/home/thanotos/BalanceCube/codegen\" -I \"../interface\" -I \"..\" -I \"/usr/local/MATLAB/R2025b/toolbox/coder/rtiostream/src/utils_host\" -I \"/usr/local/MATLAB/R2025b/extern/include\" -I \".\" -DMODEL=balanceCubeControllerStep_sil -DMATLAB_MEX_FILE -Wno-stringop-overflow -Wno-maybe-uninitialized -c  /usr/local/MATLAB/R2025b/extern/version/c_mexapi_version.c -o build/glnxa64/c_mexapi_version.o",
+    "file": "/usr/local/MATLAB/R2025b/extern/version/c_mexapi_version.c",
+    "output": "build/glnxa64/c_mexapi_version.o"
+  }
+]

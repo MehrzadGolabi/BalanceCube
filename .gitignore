@@ -5,3 +5,12 @@ Schematics/Balance_cube-backups/Balance_cube-2025-05-15_230941.zip
 Schematics/Balance_cube-backups/Balance_cube-2025-05-15_225937.zip
 Schematics/Balance_cube-backups/Balance_cube-2025-05-15_224919.zip
 Schematics/Balance_cube-backups/Balance_cube-2025-05-15_220209.zip
+
+# FreeCAD backups and Python caches
+*.FCBak
+__pycache__/
+
+# Agent session logs (private) and Simulink build caches
+.agy_scratchpad/
+slprj/
+*.slxc
